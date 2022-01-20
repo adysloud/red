@@ -132,7 +132,7 @@ class MainWindows(QWidget):
                     self.sleep_or_sit_nowtime+=1
                     if self.sleep_or_sit_nowtime>=self.sleep_or_sit_time:
                         self.sleep_or_sit_nowtime=0
-                        self.relax_flag = False
+                        self.sit_flag = False
                     self.image_index = 0
             elif self.sleep_flag==True:
                 self.path=os.path.join(self.resource, self.run_diction, 'sleep', str(self.image_index) + '.png')
@@ -142,7 +142,7 @@ class MainWindows(QWidget):
                     self.sleep_or_sit_nowtime+=1
                     if self.sleep_or_sit_nowtime>=self.sleep_or_sit_time:
                         self.sleep_or_sit_nowtime=0
-                        self.relax_flag = False
+                        self.sleep_flag = False
                     self.image_index = 0
             else:
                 self.position_x=self.position_x+self.step_length*self.run_diction_index
@@ -158,7 +158,7 @@ class MainWindows(QWidget):
                     self.run_diction_index = 0
                     self.image_index = 0
         else:
-            next_action_index=random.randint(1,113)
+            next_action_index=random.randint(1,110)
             if next_action_index<=70:  # relax
                 self.relax_flag=True
             elif next_action_index<=100:  # run(move)
@@ -169,11 +169,11 @@ class MainWindows(QWidget):
                     self.run_diction='right'
                     self.run_diction_index=1
                 self.run_length = random.randint(1, 5) * (self.run_index-1) * self.step_length*self.the_same_image_index
-            elif next_action_index<=110:  # sit
-                self.sleep_or_sit_time=int((next_action_index-100)/2)
+            elif next_action_index<=105:  # sit
+                self.sleep_or_sit_time=next_action_index-100
                 self.sit_flag=True
-            elif next_action_index<=113:  # sleep
-                self.sleep_or_sit_time=(next_action_index-110)*2
+            elif next_action_index<=110:  # sleep
+                self.sleep_or_sit_time=next_action_index-105
                 self.sleep_flag=True
         self.repaint()
 
