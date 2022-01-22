@@ -41,7 +41,7 @@ class MainWindows(QWidget):
         # 当前加载的图片路径与第几张图与当前图片的第几个周期与...
         self.image_index=0  # 第几张图
         self.the_same_image=0  # 当前图片的第几个周期
-        self.the_same_image_index=3  # 同一图组加载多少图
+        self.the_same_image_index=2  # 同一图组加载多少图
         self.path=os.path.join(self.resource,str(self.image_index)+'.jpg')
 
         # 扫描各图像包图像量
@@ -53,7 +53,7 @@ class MainWindows(QWidget):
         self.sleep_index=len(os.listdir(os.path.join(self.resource,'left','sleep')))
 
         # 图像刷新频率(ms)
-        self.image_refresh_rate=20
+        self.image_refresh_rate=30
 
         # 运动方向与长度
         self.run_diction='left'
