@@ -53,7 +53,7 @@ class MainWindows(QWidget):
         self.sleep_index=len(os.listdir(os.path.join(self.resource,'left','sleep')))
 
         # 图像刷新频率(ms)
-        self.image_refresh_rate=30
+        self.image_refresh_rate=40
 
         # 运动方向与长度
         self.run_diction='left'
@@ -170,10 +170,10 @@ class MainWindows(QWidget):
                     self.run_diction_index=1
                 self.run_length = random.randint(1, 5) * (self.run_index-1) * self.step_length*self.the_same_image_index
             elif next_action_index<=105:  # sit
-                self.sleep_or_sit_time=next_action_index-100
+                self.sleep_or_sit_time=(next_action_index-100)*8
                 self.sit_flag=True
             elif next_action_index<=110:  # sleep
-                self.sleep_or_sit_time=next_action_index-105
+                self.sleep_or_sit_time=(next_action_index-103)*10
                 self.sleep_flag=True
         self.repaint()
 
@@ -241,12 +241,10 @@ class MainWindows(QWidget):
 
     def paintEvent(self, event):
         qp = QPainter(self)
-        qp.begin(self)
         # 装载图像
         image = QImage(self.path)
         rect3 = QRect(self.position_x, self.position_y, image.width(), image.height())
         qp.drawImage(rect3, image)
-        qp.end()
 
     def tray_init(self):
         # QAction https://hanhan.blog.csdn.net/article/details/113248533
