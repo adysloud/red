@@ -3,7 +3,8 @@ import random
 import sys
 import win32api
 import win32con
-from PyQt5.Qt import QCursor
+from PyQt5 import QtGui,QtCore
+from PyQt5.Qt import *
 from PyQt5.QtCore import Qt, QRect, QTimer
 from PyQt5.QtGui import QPainter, QImage, QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QSystemTrayIcon, QAction, QMenu
@@ -22,8 +23,10 @@ class MainWindows(QWidget):
         # 设置窗口的尺寸
         self.resize(3000, 3000)
 
-        # 初始化托盘
+        # 初始化菜单，托盘与右键人物用同一套菜单
+        self.menu_init()
         self.tray_init()
+        self.right_press_menu()
 
         # 当前图片位置(左上角)
         self.position_x = 700
@@ -36,6 +39,8 @@ class MainWindows(QWidget):
         self.Poke_flag=False  # 戳一戳
         self.sit_flag=False
         self.sleep_flag=False
+
+        self.right_press_flag=False  # 是否右键按下
 
         # 当前加载的图片路径与第几张图与当前图片的第几个周期与...
         self.image_index=0  # 第几张图
@@ -212,17 +217,21 @@ class MainWindows(QWidget):
 
     # 鼠标相关代码
     # 一次性（检测鼠标按下）
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, ev: QtGui.QMouseEvent) -> None:
         self.timer.stop()
-        self.image_index=0
-        self.relax_flag=False
-        self.sit_flag=False
-        self.sleep_flag=False
-        self.Poke_flag=True
+        self.image_index = 0
+        self.relax_flag = False
+        self.sit_flag = False
+        self.sleep_flag = False
+        self.right_press_flag=False
         self.run_diction_index = 0
         self.Gravity_velocity = 0
         self.the_same_image = 0
-        self.mouse_drag_pos = event.globalPos() - self.pos()
+        if ev.buttons() == QtCore.Qt.LeftButton:  # 左键 绑定
+            self.Poke_flag = True
+            self.mouse_drag_pos = ev.globalPos() - self.pos()
+        elif ev.buttons() == QtCore.Qt.RightButton:  # 右键 绑定
+            self.right_press_flag=True
 
     # 只要鼠标按下循环触发
     def mouseMoveEvent(self, event):
@@ -244,7 +253,9 @@ class MainWindows(QWidget):
             self.position_y+=1
         else:
             self.Poke_flag=False
-        self.timer.start(self.image_refresh_rate)
+        if not self.right_press_flag:
+            self.timer.start(self.image_refresh_rate)
+
 
     def paintEvent(self, event):
         qp = QPainter(self)
@@ -253,18 +264,26 @@ class MainWindows(QWidget):
         rect3 = QRect(self.position_x, self.position_y, image.width(), image.height())
         qp.drawImage(rect3, image)
 
-    def tray_init(self):
-        # QAction https://hanhan.blog.csdn.net/article/details/113248533
+    def menu_init(self):
         quit_action = QAction('退出', self, triggered=self.quit)  # 设置右键点开能看到的选项与相应功能
-        # quit_action = QAction('退出',self)  # 设置右键点开能看到的选项与相应功能
-        # quit_action.setShortcut('Ctrl+Alt+q')  # 设置快捷键(事实上没有任何效果）
         quit_action.setIcon(QIcon('red\\0.jpg'))  # 设置右键点开时左边的图片
         self.tray_icon_menu = QMenu(self)
         self.tray_icon_menu.addAction(quit_action)  # 添加功能（猜的）
+
+    def tray_init(self):
         self.tray_icon = QSystemTrayIcon(self)
         self.tray_icon.setIcon(QIcon('red\\0.jpg'))  # 托盘图案
         self.tray_icon.setContextMenu(self.tray_icon_menu)  # 绑定功能
         self.tray_icon.show()  # show
+
+    def right_press_menu(self):
+        # 将ContextMenuPolicy设置为Qt.CustomContextMenu
+        # 否则无法使用customContextMenuRequested信号
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        # 创建QMenu信号事件
+        self.customContextMenuRequested.connect(self.showMenu)
+    def showMenu(self):
+        self.tray_icon_menu.exec_(QCursor.pos())  # 在鼠标位置显示
 
     def the_same_image_index_check(self):
         if self.the_same_image>=self.the_same_image_index:
