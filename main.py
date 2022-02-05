@@ -32,7 +32,6 @@ class MainWindows(QWidget):
         # flag
         self.end_drop_flag=False  # 落地
         self.relax_flag=False  # relax
-        self.the_coffin_board_of_Newton_flag=False  # 飞出去
         self.Geocentric_travel_notes=False  # 人为拖下去
         self.Poke_flag=False  # 戳一戳
         self.sit_flag=False
@@ -41,7 +40,7 @@ class MainWindows(QWidget):
         # 当前加载的图片路径与第几张图与当前图片的第几个周期与...
         self.image_index=0  # 第几张图
         self.the_same_image=0  # 当前图片的第几个周期
-        self.the_same_image_index=2  # 同一图组加载多少图
+        self.the_same_image_index=3  # 同一图组加载多少图
         self.path=os.path.join(self.resource,str(self.image_index)+'.jpg')
 
         # 扫描各图像包图像量
@@ -53,7 +52,7 @@ class MainWindows(QWidget):
         self.sleep_index=len(os.listdir(os.path.join(self.resource,'left','sleep')))
 
         # 图像刷新频率(ms)
-        self.image_refresh_rate=40
+        self.image_refresh_rate=30
 
         # 运动方向与长度
         self.run_diction='left'
@@ -95,10 +94,11 @@ class MainWindows(QWidget):
     # 是否sleep
     # 下一个动作判断
     def Central_processor(self):
-        if self.the_coffin_board_of_Newton_flag==True or self.position_y<self.down_bound:
+        if self.position_y!=self.down_bound and not self.Poke_flag:
             if self.position_y>self.down_bound:
                 self.Geocentric_travel_notes=True
             self.the_coffin_board_of_Newton()
+            self.repaint()
         elif self.end_drop_flag==True:
             self.path=os.path.join(self.resource,self.run_diction,'drop',str(self.image_index)+'.png')
             self.the_same_image+=1
@@ -106,6 +106,7 @@ class MainWindows(QWidget):
             if self.image_index>=self.drop_index:
                 self.end_drop_flag=False
                 self.image_index=0
+            self.repaint()
         elif self.Poke_flag==True:
             self.path=os.path.join(self.resource,self.run_diction,'poke',str(self.image_index)+'.png')
             self.the_same_image += 1
@@ -115,6 +116,7 @@ class MainWindows(QWidget):
                 self.position_y-=1
                 self.Poke_flag=False
                 self.image_index=0
+            if self.the_same_image==0:
                 self.repaint()
         elif self.run_diction_index!=0 or self.relax_flag==True or self.sit_flag==True or self.sleep_flag==True:
             if self.relax_flag==True:  # relax
@@ -124,6 +126,8 @@ class MainWindows(QWidget):
                 if self.image_index >= self.relax_index:
                     self.relax_flag = False
                     self.image_index = 0
+                if self.the_same_image == 0:
+                    self.repaint()
             elif self.sit_flag==True:
                 self.path=os.path.join(self.resource, self.run_diction, 'sit', str(self.image_index) + '.png')
                 self.the_same_image += 1
@@ -134,6 +138,8 @@ class MainWindows(QWidget):
                         self.sleep_or_sit_nowtime=0
                         self.sit_flag = False
                     self.image_index = 0
+                if self.the_same_image == 0:
+                    self.repaint()
             elif self.sleep_flag==True:
                 self.path=os.path.join(self.resource, self.run_diction, 'sleep', str(self.image_index) + '.png')
                 self.the_same_image += 1
@@ -144,6 +150,8 @@ class MainWindows(QWidget):
                         self.sleep_or_sit_nowtime=0
                         self.sleep_flag = False
                     self.image_index = 0
+                if self.the_same_image==0:
+                    self.repaint()
             else:
                 self.position_x=self.position_x+self.step_length*self.run_diction_index
                 self.path = os.path.join(self.resource, self.run_diction, 'move', str(self.image_index) + '.png')
@@ -157,6 +165,7 @@ class MainWindows(QWidget):
                 if self.run_length<=0:
                     self.run_diction_index = 0
                     self.image_index = 0
+                self.repaint()
         else:
             next_action_index=random.randint(1,110)
             if next_action_index<=70:  # relax
@@ -175,7 +184,7 @@ class MainWindows(QWidget):
             elif next_action_index<=110:  # sleep
                 self.sleep_or_sit_time=(next_action_index-103)*10
                 self.sleep_flag=True
-        self.repaint()
+            self.repaint()
 
     def the_coffin_board_of_Newton(self):
         self.position_x = self.position_x + self.delta_x
@@ -189,6 +198,7 @@ class MainWindows(QWidget):
                 self.delta_x=0
                 self.delta_y=0
                 self.Gravity_velocity = 0
+                self.image_index+=1
         else:
             if self.position_y>self.down_bound+300:
                 self.position_y=self.up_bound
@@ -209,8 +219,9 @@ class MainWindows(QWidget):
         self.sit_flag=False
         self.sleep_flag=False
         self.Poke_flag=True
-        self.run_diction_index=0
+        self.run_diction_index = 0
         self.Gravity_velocity = 0
+        self.the_same_image = 0
         self.mouse_drag_pos = event.globalPos() - self.pos()
 
     # 只要鼠标按下循环触发
@@ -229,10 +240,6 @@ class MainWindows(QWidget):
 
     # 重写鼠标抬起事件
     def mouseReleaseEvent(self, event):
-        if self.Poke_flag==False:
-            self.the_coffin_board_of_Newton_flag = True
-        else:
-            self.the_coffin_board_of_Newton_flag = False
         if self.position_y==self.down_bound:
             self.position_y+=1
         else:
