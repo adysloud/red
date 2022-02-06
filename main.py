@@ -1,3 +1,8 @@
+'''
+作者：守陵人渊云
+b站：python降临到我身边
+转载时请注明出处
+'''
 import os
 import random
 import sys
@@ -303,3 +308,6 @@ if __name__=='__main__':
     main.show()
     # 进入程序主循环
     sys.exit(app.exec_())
+
+
+
