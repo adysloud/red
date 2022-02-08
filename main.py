@@ -104,7 +104,7 @@ class MainWindows(QWidget):
     # 是否sleep
     # 下一个动作判断
     def Central_processor(self):
-        if self.position_y!=self.down_bound and not self.Poke_flag:
+        if self.position_y!=self.down_bound:
             if self.position_y>self.down_bound:
                 self.Geocentric_travel_notes=True
             self.the_coffin_board_of_Newton()
@@ -123,7 +123,6 @@ class MainWindows(QWidget):
             self.the_same_image_index_check()
             if self.image_index>=self.poke_index:
                 self.path=os.path.join(self.resource,self.run_diction,'relax','0.png')
-                self.position_y-=1
                 self.Poke_flag=False
                 self.image_index=0
             if self.the_same_image==0:
@@ -255,7 +254,7 @@ class MainWindows(QWidget):
     # 重写鼠标抬起事件
     def mouseReleaseEvent(self, event):
         if self.position_y==self.down_bound:
-            self.position_y+=1
+            pass
         else:
             self.Poke_flag=False
         if not self.right_press_flag:
@@ -308,6 +307,3 @@ if __name__=='__main__':
     main.show()
     # 进入程序主循环
     sys.exit(app.exec_())
-
-
-
