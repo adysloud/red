@@ -88,6 +88,10 @@ class MainWindows(QWidget):
         self.up_bound = -200
         self.down_bound = win32api.GetSystemMetrics(win32con.SM_CYSCREEN)-266
 
+        # 鼠标拖动修正
+        self.mouse_x=0
+        self.mouse_y=0
+
         # 初始化一个定时器
         self.timer = QTimer()
         self.timer.start(self.image_refresh_rate)
@@ -223,14 +227,20 @@ class MainWindows(QWidget):
     # 一次性（检测鼠标按下）
     def mousePressEvent(self, ev: QtGui.QMouseEvent) -> None:
         self.timer.stop()
-        self.image_index = 0
         self.relax_flag = False
         self.sit_flag = False
         self.sleep_flag = False
         self.right_press_flag=False
         self.run_diction_index = 0
         self.Gravity_velocity = 0
-        self.the_same_image = 0
+
+        # 鼠标位置相对人物左上角坐标差
+        self.mouse_x=QCursor.pos().x()-self.position_x
+        self.mouse_y=QCursor.pos().y()-self.position_y
+
+        if not self.Poke_flag:
+            self.the_same_image = 0
+            self.image_index = 0
         if ev.buttons() == QtCore.Qt.LeftButton:  # 左键 绑定
             self.Poke_flag = True
             self.mouse_drag_pos = ev.globalPos() - self.pos()
@@ -240,10 +250,10 @@ class MainWindows(QWidget):
     # 只要鼠标按下循环触发
     def mouseMoveEvent(self, event):
         self.Poke_flag=False
-        self.delta_x=int((QCursor.pos().x()-75-self.position_x)/5)
-        self.delta_y=int((QCursor.pos().y()-119-self.position_y)/5)
-        self.position_x=QCursor.pos().x()-75
-        self.position_y=QCursor.pos().y()-119
+        self.delta_x=int((QCursor.pos().x()-self.mouse_x-self.position_x)/5)
+        self.delta_y=int((QCursor.pos().y()-self.mouse_y-self.position_y)/5)
+        self.position_x=QCursor.pos().x()-self.mouse_x
+        self.position_y=QCursor.pos().y()-self.mouse_y
         if self.delta_x > 0:
             self.run_diction = 'right'
         else:
@@ -253,8 +263,8 @@ class MainWindows(QWidget):
 
     # 重写鼠标抬起事件
     def mouseReleaseEvent(self, event):
-        if self.position_y==self.down_bound:
-            pass
+        if self.position_y>self.down_bound-3 and self.position_y<self.down_bound+3:
+            self.position_y=self.down_bound
         else:
             self.Poke_flag=False
         if not self.right_press_flag:
