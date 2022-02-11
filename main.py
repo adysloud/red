@@ -131,54 +131,53 @@ class MainWindows(QWidget):
                 self.image_index=0
             if self.the_same_image==0:
                 self.repaint()
-        elif self.run_diction_index!=0 or self.relax_flag==True or self.sit_flag==True or self.sleep_flag==True:
-            if self.relax_flag==True:  # relax
-                self.path = os.path.join(self.resource, self.run_diction,'relax', str(self.image_index) + '.png')
-                self.the_same_image += 1
-                self.the_same_image_index_check()
-                if self.image_index >= self.relax_index:
-                    self.relax_flag = False
-                    self.image_index = 0
-                if self.the_same_image == 0:
-                    self.repaint()
-            elif self.sit_flag==True:
-                self.path=os.path.join(self.resource, self.run_diction, 'sit', str(self.image_index) + '.png')
-                self.the_same_image += 1
-                self.the_same_image_index_check()
-                if self.image_index >= self.sit_index:
-                    self.sleep_or_sit_nowtime+=1
-                    if self.sleep_or_sit_nowtime>=self.sleep_or_sit_time:
-                        self.sleep_or_sit_nowtime=0
-                        self.sit_flag = False
-                    self.image_index = 0
-                if self.the_same_image == 0:
-                    self.repaint()
-            elif self.sleep_flag==True:
-                self.path=os.path.join(self.resource, self.run_diction, 'sleep', str(self.image_index) + '.png')
-                self.the_same_image += 1
-                self.the_same_image_index_check()
-                if self.image_index >= self.sleep_index:
-                    self.sleep_or_sit_nowtime+=1
-                    if self.sleep_or_sit_nowtime>=self.sleep_or_sit_time:
-                        self.sleep_or_sit_nowtime=0
-                        self.sleep_flag = False
-                    self.image_index = 0
-                if self.the_same_image==0:
-                    self.repaint()
-            else:
-                self.position_x=self.position_x+self.step_length*self.run_diction_index
-                self.path = os.path.join(self.resource, self.run_diction, 'move', str(self.image_index) + '.png')
-                self.the_same_image += 1
-                self.the_same_image_index_check()
-                self.run_length-=self.step_length
-                if self.position_x>=self.right_bound or self.position_x<=self.left_bound:
-                    self.run_length=0
-                if self.image_index>=self.run_index:
-                    self.image_index=1
-                if self.run_length<=0:
-                    self.run_diction_index = 0
-                    self.image_index = 0
+        elif self.relax_flag==True:  # relax
+            self.path = os.path.join(self.resource, self.run_diction,'relax', str(self.image_index) + '.png')
+            self.the_same_image += 1
+            self.the_same_image_index_check()
+            if self.image_index >= self.relax_index:
+                self.relax_flag = False
+                self.image_index = 0
+            if self.the_same_image == 0:
                 self.repaint()
+        elif self.sit_flag==True:  # sit
+            self.path=os.path.join(self.resource, self.run_diction, 'sit', str(self.image_index) + '.png')
+            self.the_same_image += 1
+            self.the_same_image_index_check()
+            if self.image_index >= self.sit_index:
+                self.sleep_or_sit_nowtime+=1
+                if self.sleep_or_sit_nowtime>=self.sleep_or_sit_time:
+                    self.sleep_or_sit_nowtime=0
+                    self.sit_flag = False
+                self.image_index = 0
+            if self.the_same_image == 0:
+                self.repaint()
+        elif self.sleep_flag==True:  # sleep
+            self.path=os.path.join(self.resource, self.run_diction, 'sleep', str(self.image_index) + '.png')
+            self.the_same_image += 1
+            self.the_same_image_index_check()
+            if self.image_index >= self.sleep_index:
+                self.sleep_or_sit_nowtime+=1
+                if self.sleep_or_sit_nowtime>=self.sleep_or_sit_time:
+                    self.sleep_or_sit_nowtime=0
+                    self.sleep_flag = False
+                self.image_index = 0
+            if self.the_same_image==0:
+                self.repaint()
+        elif self.run_diction_index!=0:  # run
+            self.position_x=self.position_x+self.step_length*self.run_diction_index
+            self.path = os.path.join(self.resource, self.run_diction, 'move', str(self.image_index) + '.png')
+            self.the_same_image += 1
+            self.the_same_image_index_check()
+            self.run_length-=self.step_length
+            if self.position_x>=self.right_bound or self.position_x<=self.left_bound:
+                self.run_length=0
+            if self.image_index>=self.run_index:
+                self.image_index=1
+            if self.run_length<=0:
+                self.run_diction_index = 0
+                self.image_index = 0
+            self.repaint()
         else:
             next_action_index=random.randint(1,110)
             if next_action_index<=70:  # relax
