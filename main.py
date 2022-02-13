@@ -253,16 +253,17 @@ class MainWindows(QWidget):
         self.delta_y=int((QCursor.pos().y()-self.mouse_y-self.position_y)/5)
         self.position_x=QCursor.pos().x()-self.mouse_x
         self.position_y=QCursor.pos().y()-self.mouse_y
-        if self.delta_x > 0:
-            self.run_diction = 'right'
-        else:
-            self.run_diction = 'left'
-        self.path=os.path.join(self.resource,self.run_diction,'drop','0.png')
+        if not (self.down_bound - 3 < self.position_y < self.down_bound + 3):
+            if self.delta_x > 0:
+                self.run_diction = 'right'
+            elif self.delta_x < 0:
+                self.run_diction = 'left'
+            self.path=os.path.join(self.resource,self.run_diction,'drop','0.png')
         self.repaint()
 
     # 重写鼠标抬起事件
     def mouseReleaseEvent(self, event):
-        if self.position_y>self.down_bound-3 and self.position_y<self.down_bound+3:
+        if self.down_bound-3 < self.position_y < self.down_bound+3:
             self.position_y=self.down_bound
         else:
             self.Poke_flag=False
