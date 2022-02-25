@@ -14,7 +14,7 @@ exe文件大于github允许上传的文件最大值，故不放出，确有需�
 
 **退出在托盘里**
 
-
+素材获取教程参考https://www.bilibili.com/video/BV1Q5411o7zK
 
 
 作者：守陵人渊云
